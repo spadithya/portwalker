@@ -6,11 +6,11 @@
 
 ## Read / watch list
 
-- [ ] **Professor Messer · OSI Model** (~7 min, YouTube) — where TCP/IP sits relative to the rest of the stack.
-- [ ] **Professor Messer · IPv4 Addressing** (~7 min, YouTube) — IPs, subnets, what "a host" means.
-- [ ] **TCP 3-way handshake** — read any clear write-up. Diagram the SYN / SYN-ACK / ACK exchange in your own notes.
-- [ ] **Nmap docs · front page** — skim the scan types section: SYN scan, connect scan, UDP scan, what each one actually sends.
-- [ ] **Run once:** `nmap -sV scanme.nmap.org` — eyeball the output. What info comes back? Where does it come from?
+- [x] **Professor Messer · OSI Model** (~7 min, YouTube) — where TCP/IP sits relative to the rest of the stack.
+- [x] **Professor Messer · IPv4 Addressing** (~7 min, YouTube) — IPs, subnets, what "a host" means.
+- [x] **TCP 3-way handshake** — read any clear write-up. Diagram the SYN / SYN-ACK / ACK exchange in your own notes.
+- [x] **Nmap docs · front page** — skim the scan types section: SYN scan, connect scan, UDP scan, what each one actually sends.
+- [x] **Run once:** `nmap -sV scanme.nmap.org` — eyeball the output. What info comes back? Where does it come from?
 
 ## Questions to keep in mind while reading
 
