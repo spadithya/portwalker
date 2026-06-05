@@ -6,6 +6,7 @@ Everything else in this project grows around this one function.
 """
 
 import socket
+import time
 
 
 def scan_port(host, port, timeout=1.0):
@@ -37,12 +38,31 @@ def scan_port(host, port, timeout=1.0):
         sock.close()
 
 
+def scan_range(host, start, end, timeout=1.0):
+    """Scan ports `start`..`end` (inclusive), one at a time, in order.
+
+    This is the simplest possible way to scan a range: a plain loop.
+    It works -- but it's SEQUENTIAL. Every port waits for the previous
+    one to finish. The closed ports answer instantly (RST), but every
+    filtered port costs a full `timeout` of silence before we move on.
+    That cost is why step 3 will be threading.
+    """
+    open_ports = []
+    for port in range(start, end + 1):
+        if scan_port(host, port, timeout):
+            open_ports.append(port)
+            print(f"  {host}:{port} -> open")
+    return open_ports
+
+
 if __name__ == "__main__":
-    # A tiny hardcoded demo so we can run this and watch it work.
-    # scanme.nmap.org is the one public host that exists for scanner
-    # practice. From your nmap scan we KNOW the answers: 22 and 80 are
-    # open, and something like 23 (telnet) is closed.
     target = "scanme.nmap.org"
-    for port in (22, 80, 23):
-        state = "open" if scan_port(target, port) else "closed/filtered"
-        print(f"{target}:{port} -> {state}")
+    start, end = 1, 100
+
+    print(f"Scanning {target} ports {start}-{end} (sequential)...")
+    began = time.perf_counter()
+    found = scan_range(target, start, end)
+    elapsed = time.perf_counter() - began
+
+    print(f"\nDone. {len(found)} open port(s): {found}")
+    print(f"Took {elapsed:.1f}s for {end - start + 1} ports.")
