@@ -2,7 +2,7 @@
 
 > Multi-threaded TCP port scanner + service fingerprinter, written in Python.
 
-**Status:** Work in progress.
+**Status:** v1 shipped — all milestones complete.
 **Mission 1 of the [cybersecurity-journey](../cyberjournal/LEARNING_PLAN.txt) portfolio.**
 **Region of the infrastructure map:** TCP/IP, Linux, sockets.
 
@@ -74,18 +74,14 @@ portwalker/
 - [x] JSON output mode works and round-trips through `jq`
 - [x] README has real usage examples (not just planned ones)
 - [x] Repo has a LICENSE, .gitignore, and clean commit history
-- [ ] **~90-second asciinema demo** recorded, uploaded, and embedded in this README
-- [ ] `99_RECAP.md` is filled in
+- [x] **~90-second asciinema demo** recorded, uploaded, and embedded in this README
+- [x] `99_RECAP.md` is filled in
 
 ## Demo
 
-_Recorded with `asciinema rec` once the scanner works end to end. The cast will be embedded here and linked from the portfolio landing page._
+[![asciicast](https://asciinema.org/a/oOUk1FX2kEQ9Q3Sh.svg)](https://asciinema.org/a/oOUk1FX2kEQ9Q3Sh)
 
-```bash
-# What the recording will show:
-python3 portwalker.py scanme.nmap.org -p 1-1000 --threads 100
-python3 portwalker.py 192.168.0.73 -p 22,80,443 --json out.json && jq . out.json
-```
+A ~90-second walkthrough: scanning a host, grabbing banners off SSH/HTTP/FTP, and JSON output piped through `jq`. Click to play. The raw recording is in [`portwalker-demo.cast`](portwalker-demo.cast).
 
 ## Ethical use
 
