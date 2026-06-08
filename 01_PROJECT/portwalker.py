@@ -11,6 +11,26 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
+def _http_server_line(data):
+    """Pull a concise banner out of a raw HTTP response.
+
+    An HTTP reply looks like:
+        HTTP/1.1 200 OK\r\n
+        Date: ...\r\n
+        Server: Apache/2.4.65 (Ubuntu)\r\n    <- the version info we want
+        ...
+    We prefer the Server: header (that's the version, like nmap shows).
+    If there isn't one, we fall back to the status line (first line).
+    """
+    text = data.decode("utf-8", errors="replace")
+    lines = text.split("\r\n")
+    for line in lines:
+        if line.lower().startswith("server:"):
+            return line.strip()
+    # No Server header -- return the status line, or None if empty.
+    return lines[0].strip() or None if lines else None
+
+
 def probe_port(host, port, timeout=1.0):
     """Connect to one port. If open, grab its banner on the SAME socket.
 
@@ -31,16 +51,27 @@ def probe_port(host, port, timeout=1.0):
             if sock.connect_ex((host, port)) != 0:
                 return None  # closed (RST) or filtered (timeout)
 
-            # Port is open. Try to read a banner on the connection we
-            # already have. Services like SSH/FTP greet us immediately;
-            # silent ones (HTTP, until we send a request) just time out
-            # here and leave banner = None -- still a valid open port.
+            # Port is open. Step 1 -- listen passively. Services like
+            # SSH/FTP greet us immediately, so we often get the banner
+            # for free just by waiting.
             banner = None
             try:
                 data = sock.recv(1024)
                 banner = data.decode("utf-8", errors="replace").strip() or None
             except (socket.timeout, OSError):
                 pass
+
+            # Step 2 -- if it stayed silent, it may be waiting for US to
+            # speak first (HTTP does this). Send a minimal HTTP request
+            # and see if it answers. Harmless to non-HTTP services --
+            # they just ignore it or were already handled above.
+            if banner is None:
+                try:
+                    sock.sendall(b"GET / HTTP/1.0\r\n\r\n")
+                    data = sock.recv(2048)
+                    banner = _http_server_line(data)
+                except (socket.timeout, OSError):
+                    pass
 
             return {"port": port, "open": True, "banner": banner}
     except OSError:
